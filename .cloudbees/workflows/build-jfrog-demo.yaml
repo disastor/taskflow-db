@@ -1,0 +1,34 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: build-jfrog-demo
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      artifact-id:
+        value: ${{ jobs.build.outputs.artifact-id }}
+      version:
+        value: ${{ jobs.build.outputs.version }}
+
+jobs:
+  build:
+    outputs:
+      artifact-id: ${{ steps.jfrog-upload.outputs.artifact-id }}
+      version: ${{ cloudbees.version }}
+    steps:
+      - name: checkout-source-code
+        uses: cloudbees-io/checkout@v2
+
+      - name: JFrog Artifactory upload file
+        id: jfrog-upload
+        uses: cloudbees-io/jfrog-artifactory-upload-file@v1
+        with:
+          url: ${{ vars.JFROG_URL }}
+          username: ${{ vars.JFROG_USERNAME }}
+          password: ${{ secrets.JFROG_PASSWORD }}
+          file-path: ${{ cloudbees.workspace }}/init.sql
+          artifactory-path: taskflow-db/${{ cloudbees.version }}/init.sql
+          send-artifact-info: true
+          artifact-name: taskflow-db
+          artifact-version: ${{ cloudbees.version }}
