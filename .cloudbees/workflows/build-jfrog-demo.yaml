@@ -25,8 +25,7 @@ jobs:
         uses: cloudbees-io/jfrog-artifactory-upload-file@v1
         with:
           url: ${{ vars.JFROG_URL }}
-          username: ${{ vars.JFROG_USERNAME }}
-          password: ${{ secrets.JFROG_PASSWORD }}
+          token: ${{ secrets.JFROG_TOKEN }}
           file-path: ${{ cloudbees.workspace }}/init.sql
           artifactory-path: taskflow-db/${{ cloudbees.version }}/init.sql
           send-artifact-info: true
